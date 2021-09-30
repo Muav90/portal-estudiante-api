@@ -9,6 +9,25 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function login(Request $request){
+        $credentials = $request->validate([
+            'email' =>['required', 'email'],
+            'password' => ['required'],
+        ]);
+    if (Auth::attempt($credentials)){
+        $usuarioLogeado = Auth::user();
+        $token = $usuarioLogeado->createToken('TokenUsuario')->plainTextToken;
+        $respuesta = [
+          'data' =>[
+              'usuario' => $usuarioLogeado,
+              'token' => $token
+          ],
+        ];
+        return response()->json($respuesta);
+    }else{
+        return response()->json(['error'=>'Unauthorised'], 401);
+    }
+    } 
     public function register(Request $request){
         $credentials = $request->validate([
             'name' => 'required',
